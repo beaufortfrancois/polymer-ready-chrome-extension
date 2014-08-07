@@ -11,7 +11,7 @@ function hideCustomElements(event) {
 }
 
 function addWebsiteToElement(element, website) {
-  if (element.classList.contains('website') {
+  if (element.classList.contains('website')) {
     return;
   }
   element.classList.add('website');

@@ -1,0 +1,22 @@
+{
+  "name": "Polymer Ready",
+  "description": "Show an icon when polymer is used on a website.",
+  "version": "0.1",
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "matches": ["<all_urls>"],
+      "js": ["polymer-ready.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "page_action": {
+    "default_icon": "assets/icon32.png",
+    "default_popup": "popup.html",
+    "default_title": "Polymer Ready"
+  },
+  "manifest_version": 2
+}

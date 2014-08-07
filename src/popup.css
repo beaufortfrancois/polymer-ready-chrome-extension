@@ -1,0 +1,29 @@
+.el {
+  white-space: nowrap;
+  line-height: 28px;
+  font-family: 'Noto Sans UI', sans-serif;
+  font-size: 75%;
+  padding-left: 8px;
+  padding-right: 18px;
+}
+
+.el span:before {
+  content: '<';
+}
+
+.el span:after {
+  content: '>';
+}
+
+.el:hover {
+  outline: 1px dashed #3e50b4 !important;
+  background: rgba(62, 82, 179, .1) !important;
+}
+
+.website {
+  color: rgb(17, 85, 204);
+}
+
+.website span:hover {
+  cursor: pointer;
+}

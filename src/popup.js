@@ -1,7 +1,3 @@
-function navigateToWebsite(event) {
-  chrome.tabs.create({ url: event.target.dataset['website'] });
-}
-
 function showCustomElements(event) {
   port.postMessage({ action: 'show-custom-elements', filter: event.target.textContent });
 }
@@ -10,27 +6,20 @@ function hideCustomElements(event) {
   port.postMessage({ action: 'hide-custom-elements' });
 }
 
-function addWebsiteToElement(element, website) {
-  if (element.classList.contains('website')) {
-    return;
-  }
-  element.classList.add('website');
-  element.querySelector('span').dataset['website'] = website;
-  element.addEventListener('click', navigateToWebsite);
-}
-
 function probeBowerComponents(elements) {
   var xhr = new XMLHttpRequest();
   xhr.open('GET', 'https://bower-component-list.herokuapp.com');
   xhr.responseType = 'json';
   xhr.onload = function() {
-    for (var i = 0; i < elements.length; i++) {
-      var results = xhr.response.filter(function(el) {
-        return el.name === elements[i].textContent && 
-               el.keywords && el.keywords.indexOf('polymer') !== -1;
-      });
-      if (results.length > 0) {
-        addWebsiteToElement(elements[i], results[0].website);
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      for (var i = 0; i < elements.length; i++) {
+        var results = xhr.response.filter(function(el) {
+          return el.name === elements[i].textContent &&
+                 el.keywords && el.keywords.indexOf('polymer') !== -1;
+        });
+        if (results.length > 0) {
+          elements[i].querySelector('a').href = results[0].website;
+        }
       }
     }
   }
@@ -53,22 +42,24 @@ function parseLinkHeader(header) {
 }
 
 function probeGitHub(username, elements, nextUrl) {
-  var xhr = new XMLHttpRequest();
   var url = nextUrl || ('https://api.github.com/users/' + username + '/repos');
+  var xhr = new XMLHttpRequest();
   xhr.open('GET', url);
   xhr.responseType = 'json';
   xhr.onload = function() {
-    for (var i = 0; i < elements.length; i++) {
-      var results = xhr.response.filter(function(el) {
-        return el.name === elements[i].textContent;
-      });
-      if (results.length > 0) {
-        addWebsiteToElement(elements[i], results[0].html_url);
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      for (var i = 0; i < elements.length; i++) {
+        var results = xhr.response.filter(function(el) {
+          return el.name === elements[i].textContent;
+        });
+        if (results.length > 0) {
+          elements[i].querySelector('a').href = results[0].html_url;
+        }
       }
-    }
-    var linkHeader = parseLinkHeader(xhr.getResponseHeader('link'));
-    if (linkHeader && linkHeader.next) {
-      probeGitHub(username, elements, linkHeader.next);
+      var linkHeader = parseLinkHeader(xhr.getResponseHeader('link'));
+      if (linkHeader && linkHeader.next) {
+        probeGitHub(username, elements, linkHeader.next);
+      }
     }
   }
   xhr.send();
@@ -77,39 +68,39 @@ function probeGitHub(username, elements, nextUrl) {
 
 var port;
 
-document.addEventListener('DOMContentLoaded', function() {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    port = chrome.tabs.connect(tabs[0].id);
-    port.postMessage({ action: 'get-custom-elements' });
-  
-    port.onMessage.addListener(function(response) {
-      var existingElements = document.querySelectorAll('.el');
+chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+  port = chrome.tabs.connect(tabs[0].id);
+  // Send a message to polymer-ready.js to get all custom elements.
+  port.postMessage({ action: 'get-custom-elements' });
 
-      response.customElements.forEach(function(el) {
-        for (var i=0; i < existingElements.length; i++) {
-          if (existingElements[i].textContent === el) {
-            return;
-          }
-        };
-        var text = document.createElement('span');
-        text.textContent = el;
-        var element = document.createElement('div');
-        element.classList.add('el');
-        element.appendChild(text);
-        element.addEventListener('mouseenter', showCustomElements);
-        element.addEventListener('mouseleave', hideCustomElements);
-        document.body.appendChild(element);
-      });
-    
-      var elements = document.querySelectorAll('.el');
-      probeBowerComponents(elements);
-      googleElements = Array.prototype.slice.call(elements).filter(function(el) {
-        return !el.textContent.indexOf('google-');
-      });
-      if (googleElements.length) {
-        probeGitHub('GoogleWebComponents', googleElements);
+  port.onMessage.addListener(function(response) {
+    var existingElements = document.querySelectorAll('.el');
+    var addSeparator = (existingElements.length !== 0);
+
+    response.customElements.forEach(function(el) {
+      if (addSeparator) {
+        document.body.appendChild(document.createElement('hr'));
+        addSeparator = false;
       }
-      probeGitHub('Polymer', elements);
+      var anchor = document.createElement('a');
+      anchor.target= '_blank';
+      anchor.textContent = el;
+      var element = document.createElement('div');
+      element.classList.add('el');
+      element.appendChild(anchor);
+      element.addEventListener('mouseenter', showCustomElements);
+      element.addEventListener('mouseleave', hideCustomElements);
+      document.body.appendChild(element);
     });
+
+    var elements = document.querySelectorAll('.el');
+    probeBowerComponents(elements);
+    googleElements = Array.prototype.slice.call(elements).filter(function(el) {
+      return !el.textContent.indexOf('google-');
+    });
+    if (googleElements.length) {
+      probeGitHub('GoogleWebComponents', googleElements);
+    }
+    probeGitHub('Polymer', elements);
   });
 });

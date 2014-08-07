@@ -1,7 +1,10 @@
 {
   "name": "Polymer Ready",
-  "description": "Show an icon when polymer is used on a website.",
+  "description": "Show an icon in the address bar when it detects some Polymer and Custom components.",
   "version": "0.1",
+  "icons": {
+    "128": "assets/icon128.png"
+  },
   "background": {
     "scripts": ["background.js"]
   },
@@ -14,7 +17,10 @@
     }
   ],
   "page_action": {
-    "default_icon": "assets/icon32.png",
+    "default_icon": {
+      "19": "assets/icon19.png",
+      "38": "assets/icon38.png"
+    },
     "default_popup": "popup.html",
     "default_title": "Polymer Ready"
   },

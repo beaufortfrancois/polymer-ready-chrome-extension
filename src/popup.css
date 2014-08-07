@@ -5,19 +5,13 @@
   font-size: 75%;
   padding-left: 8px;
   padding-right: 18px;
-}
-
-.el span:before {
-  content: '<';
-}
-
-.el span:after {
-  content: '>';
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
 .el:hover {
-  outline: 1px dashed #3e50b4 !important;
-  background: rgba(62, 82, 179, .1) !important;
+  outline: 1px dashed #3e50b4;
 }
 
 .website {

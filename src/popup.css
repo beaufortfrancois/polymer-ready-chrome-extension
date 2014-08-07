@@ -1,6 +1,10 @@
+a {
+  transition: color .6s ease-out;
+  text-decoration: none;
+}
+
 a[href] {
   color: rgb(17, 85, 204);
-  text-decoration: none;
 }
 
 hr {

@@ -16,6 +16,7 @@
       "run_at": "document_start"
     }
   ],
+  "options_page": "options.html",
   "page_action": {
     "default_icon": {
       "19": "assets/icon19.png",
@@ -24,5 +25,6 @@
     "default_popup": "popup.html",
     "default_title": "Polymer Ready"
   },
+  "permissions": [ "storage" ],
   "manifest_version": 2
 }

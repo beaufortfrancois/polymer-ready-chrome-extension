@@ -11,7 +11,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 
       case 'get-custom-elements':
         // Get all custom elements.
-        customElements = Array.prototype.slice.call(document.all).filter(function(element) {
+        customElements = Array.prototype.slice.call(document.querySelectorAll('* /deep/ *')).filter(function(element) {
           return element.localName.indexOf('-') != -1 || element.getAttribute('is');
         });
         if (customElements.length === 0) {

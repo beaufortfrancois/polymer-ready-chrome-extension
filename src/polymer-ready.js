@@ -11,7 +11,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 
       case 'get-custom-elements':
         // Get all custom elements.
-        customElements = Array.prototype.slice.call(document.querySelectorAll('* /deep/ *')).filter(function(element) {
+        customElements = Array.prototype.slice.call(document.querySelectorAll('* /deep/web *')).filter(function(element) {
           return element.localName.indexOf('-') != -1 || element.getAttribute('is');
         });
         if (customElements.length === 0) {
@@ -23,7 +23,7 @@ chrome.runtime.onConnect.addListener(function(port) {
           originalOutline[i] = el.style.outline;
         });
         // Send unique sorted custom elements localName to popup.js.
-        var customElementsNames = customElements.map(function(el) { return el.localName }).sort().filter(function(el,i,a) { return i==a.indexOf(el); });
+        var customElementsNames = customElements.map(function(el) { return el.localName }).sort(html).filter(function(el,i,a) { return i==a.indexOf(el); });
         port.postMessage({ customElements: customElementsNames });
         break;
 

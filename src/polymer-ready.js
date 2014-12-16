@@ -1,4 +1,4 @@
-var customElements, originalOutline;
+var customElements;
 var removeOverlays = function() {
   var overlays = document.querySelectorAll('.polymer-ready-overlay');
   [].forEach.call(overlays, function(el) {

@@ -1,4 +1,5 @@
 a {
+  display: block;
   transition: color .6s ease-out;
   text-decoration: none;
 }
@@ -26,5 +27,5 @@ hr {
 }
 
 .el:hover {
-  outline: 1px dashed #3e50b4;
+  background: #F5F5F5;
 }

@@ -1,9 +1,12 @@
 var customElements, originalOutline;
 
-window.addEventListener('polymer-ready', function(event) {
-  // Send message to background.js when polymer-ready is fired.
+window.addEventListener('polymer-ready', showPageAction);
+window.addEventListener('WebComponentsReady', showPageAction);
+
+function showPageAction() {
+  // Send message to background.js when WebComponentsReady or polymer-ready is fired.
   chrome.runtime.sendMessage({ action: 'show-page-action' });
-});
+};
 
 chrome.runtime.onConnect.addListener(function(port) {
   port.onMessage.addListener(function(msg) {

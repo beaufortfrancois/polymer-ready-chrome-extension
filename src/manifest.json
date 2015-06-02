@@ -1,7 +1,7 @@
 {
   "name": "Polymer Ready",
   "description": "Show an icon in the address bar when it detects some Polymer and Custom components.",
-  "version": "0.3",
+  "version": "0.5",
   "icons": {
     "128": "assets/icon128.png"
   },

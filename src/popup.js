@@ -22,14 +22,44 @@ function parseLinkHeader(header) {
 }
 
 function probeCustomElements(elements) {
-  for (var i = 0; i < elements.length; i++) {
-    var results = window.customElements.filter(function(el) {
-      return el.name === elements[i].textContent;
-    });
-    if (results.length > 0) {
-      elements[i].querySelector('a').href = results[0].url;
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'https://customelementsio.herokuapp.com/');
+  xhr.onload = function() {
+    var prefix = 'var customElements = ';
+    if (!xhr.response.startsWith(prefix))
+      return;
+    try {
+      var customElements = JSON.parse(xhr.response.substr(prefix.length));
+    } catch(e) {
+      return;
+    }
+    for (var i = 0; i < elements.length; i++) {
+      var results = customElements.filter(function(el) {
+        return el.name === elements[i].textContent;
+      });
+      if (results.length > 0) {
+        elements[i].querySelector('a').href = results[0].url;
+      }
     }
   }
+  xhr.send();
+}
+
+function probeGooglePolymerElements(elements) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'https://elements.polymer-project.org/catalog.json');
+  xhr.responseType = 'json';
+  xhr.onload = function() {
+    for (var i = 0; i < elements.length; i++) {
+      var results = xhr.response.elements.filter(function(el) {
+        return el.name === elements[i].textContent;
+      });
+      if (results.length > 0) {
+        elements[i].querySelector('a').href = 'https://github.com/' + results[0].source;
+      }
+    }
+  }
+  xhr.send();
 }
 
 var port;
@@ -61,5 +91,6 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 
     var elements = document.querySelectorAll('.el');
     probeCustomElements(elements);
+    probeGooglePolymerElements(elements);
   });
 });

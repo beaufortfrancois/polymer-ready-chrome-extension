@@ -12,9 +12,6 @@ function showVisits() {
       website.href = keys[i];
       website.textContent = keys[i];
       visit.appendChild(website);
-      var thumb = new Image();
-      thumb.src = 'https://domains.google.com/thumb?u=' + website;
-      visit.appendChild(thumb);
       container.appendChild(visit);
     }
   });

@@ -5,17 +5,10 @@ a {
   white-space: nowrap;
   line-height: 28px;
   font-family: 'Noto Sans UI', sans-serif;
-  margin-top: 28px;
-}
-
-img {
-  margin: 0 auto;
-  height: 283px;
-  width: 379px;
-  padding: 4px;
-  background: #eee;
 }
 
 #visits {
-  text-align: center;
+  margin-top: 28px;
+  text-align: left;
+  margin-left: 16px;
 }

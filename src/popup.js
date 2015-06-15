@@ -81,6 +81,7 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       var anchor = document.createElement('a');
       anchor.target= '_blank';
       anchor.textContent = el;
+      anchor.addEventListener('click', hideCustomElements);
       var element = document.createElement('div');
       element.classList.add('el');
       element.appendChild(anchor);

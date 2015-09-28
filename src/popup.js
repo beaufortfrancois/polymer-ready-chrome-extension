@@ -1,9 +1,23 @@
 function showCustomElements(event) {
-  port.postMessage({ action: 'show-custom-elements', filter: event.target.textContent });
+  port.postMessage({ action: 'show-custom-elements',
+                     filter: event.target.textContent,
+                     pinned: Array.from(document.querySelectorAll('.pin')).map(e => e.textContent)
+                   });
 }
 
 function hideCustomElements(event) {
-  port.postMessage({ action: 'hide-custom-elements' });
+  port.postMessage({ action: 'hide-custom-elements',
+                     pinned: Array.from(document.querySelectorAll('.pin')).map(e => e.textContent)
+                   });
+}
+
+function togglePinnedCustomElements(event) {
+  this.classList.toggle('pin');
+  if (this.classList.contains('pin')) {
+    showCustomElements(event);
+  } else {
+    hideCustomElements();
+  }
 }
 
 function parseLinkHeader(header) {
@@ -85,6 +99,7 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       element.classList.add('el');
       element.appendChild(anchor);
       element.addEventListener('mouseenter', showCustomElements);
+      element.addEventListener('click', togglePinnedCustomElements);
       element.addEventListener('mouseleave', hideCustomElements);
       document.body.appendChild(element);
     });
@@ -93,4 +108,8 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     probeCustomElements(elements);
     probeGooglePolymerElements(elements);
   });
+});
+
+window.addEventListener('unload', function() {
+  port.postMessage({ action: 'hide-custom-elements', pinned: [] });
 });

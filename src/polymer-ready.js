@@ -38,7 +38,9 @@ chrome.runtime.onConnect.addListener(function(port) {
 
       case 'hide-custom-elements':
         customElements.forEach(function(element, i) {
-          element.style.outline = originalOutline[i];
+          if (msg.pinned.indexOf(element.localName) == -1) {
+            element.style.outline = originalOutline[i];
+          }
         });
         break;
     }

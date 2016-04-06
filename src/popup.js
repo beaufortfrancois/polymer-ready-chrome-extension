@@ -98,6 +98,9 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       var element = document.createElement('div');
       element.classList.add('el');
       element.appendChild(anchor);
+      if (response.unregisteredCustomElements.includes(el)) {
+        element.classList.add('unregistered');
+      }
       element.addEventListener('mouseenter', showCustomElements);
       element.addEventListener('click', togglePinnedCustomElements);
       element.addEventListener('mouseleave', hideCustomElements);

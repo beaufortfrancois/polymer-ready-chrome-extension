@@ -25,6 +25,10 @@ hr {
   cursor: default;
 }
 
+.unregistered {
+  text-decoration: line-through;
+}
+
 .el:hover,
 .pin {
   outline: 1px dashed #3e50b4;

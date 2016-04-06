@@ -27,7 +27,9 @@ chrome.runtime.onConnect.addListener(function(port) {
         });
         // Send unique sorted custom elements localName to popup.js.
         var customElementsNames = customElements.map(function(el) { return el.localName }).sort().filter(function(el,i,a) { return i==a.indexOf(el); });
-        port.postMessage({ customElements: customElementsNames });
+        // Send unique sorted unregistered custom elements localName to popup.js.
+        var unregisteredCustomElementNames = customElements.filter(function(el) { return el.constructor == HTMLElement; }).map(function(el) { return el.localName }).sort().filter(function(el,i,a) { return i==a.indexOf(el); })
+        port.postMessage({ customElements: customElementsNames, unregisteredCustomElements: unregisteredCustomElementNames });
         break;
 
       case 'show-custom-elements':

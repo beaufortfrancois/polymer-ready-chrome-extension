@@ -3,6 +3,14 @@ var customElements, originalOutline;
 window.addEventListener('polymer-ready', showPageAction);
 window.addEventListener('WebComponentsReady', showPageAction);
 
+/* Backup for websites that don't trigger WebComponentsReady manually.
+ * https://github.com/beaufortfrancois/polymer-ready-chrome-extension/issues/13#issuecomment-235654565
+ */
+document.addEventListener('dom-change', function onDomChange() {
+  document.removeEventListener('dom-change', onDomChange);
+  showPageAction();
+});
+
 function showPageAction() {
   // Send message to background.js when WebComponentsReady or polymer-ready is fired.
   chrome.runtime.sendMessage({ action: 'show-page-action' });

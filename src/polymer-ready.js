@@ -1,4 +1,4 @@
-var customElements, originalOutline;
+var customElements, originalOutline, originalBackgroundColor;
 
 window.addEventListener('polymer-ready', showPageAction);
 window.addEventListener('WebComponentsReady', showPageAction);
@@ -28,10 +28,12 @@ chrome.runtime.onConnect.addListener(function(port) {
         if (customElements.length === 0) {
           return;
         }
-        // Save original outline styles for each custom elements.
+        // Save original styles for each custom elements.
         originalOutline = [];
+        originalBackgroundColor = [];
         customElements.forEach(function(el, i) {
           originalOutline[i] = el.style.outline;
+          originalBackgroundColor[i] = el.style.backgroundColor;
         });
         // Send unique sorted custom elements localName to popup.js.
         var customElementsNames = customElements.map(function(el) { return el.localName }).sort().filter(function(el,i,a) { return i==a.indexOf(el); });
@@ -41,13 +43,15 @@ chrome.runtime.onConnect.addListener(function(port) {
       case 'show-custom-elements':
         customElements.filter(function(el) { return el.localName === msg.filter }).forEach(function(element) {
           element.style.setProperty('outline', '1px dashed #3e50b4');
+          element.style.setProperty('background-color', 'rgba(255,0,0,0.1)');
         });
         break;
 
       case 'hide-custom-elements':
         customElements.forEach(function(element, i) {
           if (msg.pinned.indexOf(element.localName) == -1) {
-            element.style.outline = originalOutline[i];
+            element.style.setProperty('outline', originalOutline[i]);
+            element.style.setProperty('background-color', originalBackgroundColor[i]);
           }
         });
         break;

@@ -14,6 +14,11 @@ hr {
   border: 0;
 }
 
+body {
+  min-width: 5%;
+  min-height: 100%
+}
+
 .el {
   white-space: nowrap;
   line-height: 28px;

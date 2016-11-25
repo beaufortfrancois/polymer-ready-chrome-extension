@@ -17,38 +17,51 @@ function showPageAction() {
 };
 
 chrome.runtime.onConnect.addListener(function(port) {
+  var allCustomElements = [];
+
+  function isCustomElement(el) {
+    const isAttr = el.getAttribute('is');
+    return el.localName.includes('-') || isAttr && isAttr.includes('-');
+  }
+
+  function findAllCustomElements(nodes) {
+    nodes.forEach((node) => {
+      if (isCustomElement(node)) { allCustomElements.push(node); }
+      if (node.shadowRoot) { findAllCustomElements(node.shadowRoot.querySelectorAll('*')); }
+    });
+  }
+
   port.onMessage.addListener(function(msg) {
     switch(msg.action) {
 
       case 'get-custom-elements':
         // Get all custom elements.
-        customElements = Array.prototype.slice.call(document.querySelectorAll('* /deep/ *')).filter(function(element) {
-          return element.localName.indexOf('-') != -1 || element.getAttribute('is');
-        });
-        if (customElements.length === 0) {
-          return;
-        }
+        findAllCustomElements(document.querySelectorAll('*'));
+        if (allCustomElements.length === 0) { return; }
+
         // Save original styles for each custom elements.
         originalOutline = [];
         originalBackgroundColor = [];
-        customElements.forEach(function(el, i) {
+        allCustomElements.forEach(function(el, i) {
           originalOutline[i] = el.style.outline;
           originalBackgroundColor[i] = el.style.backgroundColor;
         });
         // Send unique sorted custom elements localName to popup.js.
-        var customElementsNames = customElements.map(function(el) { return el.localName }).sort().filter(function(el,i,a) { return i==a.indexOf(el); });
+        let customElementsNames = allCustomElements.map((el) => { return el.localName })
+            .sort().filter((el,i,a) => { return i === a.indexOf(el); });
         port.postMessage({ customElements: customElementsNames });
         break;
 
       case 'show-custom-elements':
-        customElements.filter(function(el) { return el.localName === msg.filter }).forEach(function(element) {
-          element.style.setProperty('outline', '1px dashed #3e50b4');
-          element.style.setProperty('background-color', 'rgba(255,0,0,0.1)');
-        });
+        allCustomElements.filter((element) => { return element.localName === msg.filter; })
+          .forEach((element) => {
+            element.style.setProperty('outline', '1px dashed #3e50b4');
+            element.style.setProperty('background-color', 'rgba(255,0,0,0.1)');
+          });
         break;
 
       case 'hide-custom-elements':
-        customElements.forEach(function(element, i) {
+        allCustomElements.forEach((element, i) => {
           if (msg.pinned.indexOf(element.localName) == -1) {
             element.style.setProperty('outline', originalOutline[i]);
             element.style.setProperty('background-color', originalBackgroundColor[i]);

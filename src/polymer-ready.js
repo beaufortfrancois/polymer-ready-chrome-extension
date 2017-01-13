@@ -6,18 +6,15 @@ window.addEventListener('WebComponentsReady', showPageAction);
 /* Backup for websites that don't trigger WebComponentsReady manually.
  * https://github.com/beaufortfrancois/polymer-ready-chrome-extension/issues/13#issuecomment-235654565
  */
-document.addEventListener('dom-change', function onDomChange() {
-  document.removeEventListener('dom-change', onDomChange);
-  showPageAction();
-});
+document.addEventListener('dom-change', showPageAction, { once:  true });
 
 function showPageAction() {
   // Send message to background.js when WebComponentsReady or polymer-ready is fired.
   chrome.runtime.sendMessage({ action: 'show-page-action' });
-};
+}
 
-chrome.runtime.onConnect.addListener(function(port) {
-  var allCustomElements = [];
+chrome.runtime.onConnect.addListener(port => {
+  let allCustomElements = [];
 
   function isCustomElement(el) {
     const isAttr = el.getAttribute('is');
@@ -25,36 +22,42 @@ chrome.runtime.onConnect.addListener(function(port) {
   }
 
   function findAllCustomElements(nodes) {
-    nodes.forEach((node) => {
-      if (isCustomElement(node)) { allCustomElements.push(node); }
-      if (node.shadowRoot) { findAllCustomElements(node.shadowRoot.querySelectorAll('*')); }
+    nodes.forEach(node => {
+      if (isCustomElement(node)) {
+        allCustomElements.push(node);
+      }
+      if (node.shadowRoot) {
+        findAllCustomElements(node.shadowRoot.querySelectorAll('*'));
+      }
     });
   }
 
-  port.onMessage.addListener(function(msg) {
+  port.onMessage.addListener(msg => {
     switch(msg.action) {
 
       case 'get-custom-elements':
         // Get all custom elements.
         findAllCustomElements(document.querySelectorAll('*'));
-        if (allCustomElements.length === 0) { return; }
+        if (allCustomElements.length === 0) {
+          return;
+        }
 
         // Save original styles for each custom elements.
         originalOutline = [];
         originalBackgroundColor = [];
-        allCustomElements.forEach(function(el, i) {
+        allCustomElements.forEach((el, i) => {
           originalOutline[i] = el.style.outline;
           originalBackgroundColor[i] = el.style.backgroundColor;
         });
         // Send unique sorted custom elements localName to popup.js.
-        let customElementsNames = allCustomElements.map((el) => { return el.localName })
-            .sort().filter((el,i,a) => { return i === a.indexOf(el); });
+        const customElementsNames = allCustomElements.map(el => el.localName)
+            .sort().filter((el, i, a) => i === a.indexOf(el));
         port.postMessage({ customElements: customElementsNames });
         break;
 
       case 'show-custom-elements':
-        allCustomElements.filter((element) => { return element.localName === msg.filter; })
-          .forEach((element) => {
+        allCustomElements.filter(element => element.localName === msg.filter)
+          .forEach(element => {
             element.style.setProperty('outline', '1px dashed #3e50b4');
             element.style.setProperty('background-color', 'rgba(255,0,0,0.1)');
           });

@@ -50,7 +50,7 @@ chrome.runtime.onConnect.addListener(port => {
           originalBackgroundColor[i] = el.style.backgroundColor;
         });
         // Send unique sorted custom elements localName to popup.js.
-        const customElementsNames = allCustomElements.map(el => el.localName)
+        const customElementsNames = allCustomElements.map(el => el.localName.includes('-') && el.localName || `${el.getAttribute('is')} (${el.localName})`)
             .sort().filter((el, i, a) => i === a.indexOf(el));
         port.postMessage({ customElements: customElementsNames });
         break;
